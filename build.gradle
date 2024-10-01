@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'io.quarkus'
+    id 'io.freefair.lombok'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen:6.6.0.Final',
+            'org.mapstruct:mapstruct-processor:1.6.2'
+    implementation enforcedPlatform('io.quarkus.platform:quarkus-bom:3.14.4'),
+            'io.quarkus:quarkus-arc',
+            'io.quarkus:quarkus-hibernate-orm',
+            'io.quarkus:quarkus-hibernate-validator',
+            'io.quarkus:quarkus-jdbc-postgresql',
+            'io.quarkus:quarkus-rest',
+            'io.quarkus:quarkus-rest-jackson',
+            'org.mapstruct:mapstruct:1.6.2'
+    testImplementation 'io.quarkus:quarkus-junit5',
+            'io.rest-assured:rest-assured:4.4.0',
+            'org.hamcrest:hamcrest:3.0'
+
+}
+
+group 'de.ottorohenkohl.bloggin'
+version '1.0-SNAPSHOT'
+
+compileJava {
+    options.encoding = 'UTF-8'
+
+    options.compilerArgs += [
+            '-Amapstruct.unmappedSourcePolicy=IGNORE',
+            '-Amapstruct.unmappedTargetPolicy=IGNORE',
+            '-Amapstruct.defaultComponentModel=cdi',
+            '-Amapstruct.nullValueIterableMappingStrategy=RETURN_DEFAULT',
+            '-Amapstruct.nullValueMapMappingStrategy=RETURN_DEFAULT'
+    ]
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}

@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+
+# Build
+build/
+
+# IntelliJ
+.idea
+
+# Visual Studio Code
+.vscode
+.factorypath
+
+# MacOS
+.DS_Store
+
+# Vim
+*.swp
+*.swo
+
+# Local environment
+.env
