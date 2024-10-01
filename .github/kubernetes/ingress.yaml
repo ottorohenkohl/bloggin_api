@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind:       IngressRoute
+metadata:
+  namespace: bloggin-system
+  name:      bloggin-ingress-api
+spec:
+  entryPoints:
+    - secured
+  routes:
+    - match: Host(`ottorohenkohl.de`)
+      kind:  Rule
+      services:
+        - name: bloggin-service-api
+          port: 8080
+  tls:
+    certResolver: letsencrypt

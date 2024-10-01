@@ -1,0 +1,82 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name:    Run test suit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4.1.7
+      - name: Setup Java
+        uses: actions/setup-java@v4.2.1
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Run Gradle tests
+        uses: gradle/actions/setup-gradle@v3.4.2
+      - name: Execute tests
+        run:  ./gradlew test
+  build:
+    name:    Build native artifact
+    needs:   test
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4.1.7
+      - name: Setup Java
+        uses: actions/setup-java@v4.2.1
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Run Gradle build
+        uses: gradle/actions/setup-gradle@v3.4.2
+      - name: Execute native build
+        run:  >
+              ./gradlew build -Dnative -Dskip.tests=true 
+              -Dquarkus.native.container-build=true 
+              -Dquarkus.container-image.push=true 
+              -Dquarkus.container-image.build=true 
+              -Dquarkus.container-image.registry=ghcr.io 
+              -Dquarkus.container-image.tag=latest 
+              -Dquarkus.container-image.additional-tags=${{ github.RUN_ID }}
+              -Dquarkus.container-image.group=${{ github.REPOSITORY }}
+              -Dquarkus.container-image.username=${{ github.REPOSITORY_OWNER }}
+              -Dquarkus.container-image.password=${{ secrets.GITHUB_TOKEN }}
+  deploy:
+    name:    Deploy to Kubernetes
+    needs:   build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      actions:  read
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+      - name: Set Kubernetes context
+        uses: azure/k8s-set-context@v3.0
+        with:
+          kubeconfig: ${{ secrets.KUBERNETES_CONFIG }}
+          k8s-url:    ${{ secrets.KUBERNETES_SERVER }}
+          method:     kubeconfig
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4.0.0
+        id:   install
+      - name: Deploy image and manifests
+        uses: azure/k8s-deploy@v4.9
+        with:
+          images:    ghcr.io/${{ github.REPOSITORY }}/bloggin_web:${{ github.RUN_ID }}
+          manifests: |
+                     .github/kubernetes/volume.yaml
+                     .github/kubernetes/service.yaml
+                     .github/kubernetes/deployment.yaml
+                     .github/kubernetes/ingress.yaml
+          namespace: bloggin-system

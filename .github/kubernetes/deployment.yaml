@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind:       Deployment
+metadata:
+  namespace: bloggin-system
+  name:      bloggin-deployment-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bloggin-api
+  template:
+    metadata:
+      labels:
+        app: bloggin-api
+    spec:
+      volumes:
+        - name: bloggin-volume-postgres
+          persistentVolumeClaim:
+            claimName: bloggin-claim-postgres
+      containers:
+        - name:  bloggin-container-postgres
+          image: postgres
+          volumeMounts:
+            - name:      bloggin-volume-postgres
+              mountPath: /var/lib/postgresql
+          env:
+            - name:  POSTGRES_HOST_AUTH_METHOD
+              value: trust
+            - name:  POSTGRES_USER
+              value: bloggin
+        - name:  bloggin-container-api
+          image: ghcr.io/ottorohenkohl/bloggin_web/bloggin_api:latest
+          env:
+            - name:  QUARKUS_DATASOURCE_USERNAME
+              value: bloggin
+            - name:  QUARKUS_DATASOURCE_JDBC_URL
+              value: jdbc:postgresql://localhost:5432/bloggin
+            - name:  QUARKUS_HIBERNATE-ORM_DATABASE_GENERATION
+              value: update
+      imagePullSecrets:
+        - name: bloggin-registry

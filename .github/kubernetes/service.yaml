@@ -1,0 +1,13 @@
+apiVersion: v1
+kind:       Service
+metadata:
+  namespace: bloggin-system
+  name:      bloggin-service-api
+  labels:
+    app: bloggin-api
+spec:
+  ports:
+    - port: 8080
+      name: quarkus
+  selector:
+    app: bloggin-api
