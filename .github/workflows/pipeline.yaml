@@ -73,7 +73,7 @@ jobs:
       - name: Deploy image and manifests
         uses: azure/k8s-deploy@v4.9
         with:
-          images:    ghcr.io/${{ github.REPOSITORY }}/bloggin_web:${{ github.RUN_ID }}
+          images:    ghcr.io/${{ github.REPOSITORY }}/${{ github.REPOSITORY }}:${{ github.RUN_ID }}
           manifests: |
                      .github/kubernetes/volume.yaml
                      .github/kubernetes/service.yaml

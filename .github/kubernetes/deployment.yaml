@@ -29,7 +29,7 @@ spec:
             - name:  POSTGRES_USER
               value: bloggin
         - name:  bloggin-container-api
-          image: ghcr.io/ottorohenkohl/bloggin_web/bloggin_api:latest
+          image: ghcr.io/ottorohenkohl/bloggin_api/bloggin_api:latest
           env:
             - name:  QUARKUS_DATASOURCE_USERNAME
               value: bloggin
