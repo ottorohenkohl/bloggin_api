@@ -14,6 +14,7 @@ dependencies {
             'org.mapstruct:mapstruct-processor:1.6.2'
     implementation enforcedPlatform('io.quarkus.platform:quarkus-bom:3.14.4'),
             'io.quarkus:quarkus-arc',
+            'io.quarkus:quarkus-container-image-docker',
             'io.quarkus:quarkus-hibernate-orm',
             'io.quarkus:quarkus-hibernate-validator',
             'io.quarkus:quarkus-jdbc-postgresql',
